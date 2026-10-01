@@ -82,8 +82,30 @@ def over_under_amount(payments_total, total_debt):
 
 
 def to_currency(amount, exchange_rate):
-    """Convert an amount to a target currency using the exchange rate."""
+    """Convert an amount to a target currency using the exchange rate.
+    
+    ex_rate is stored as LAK per USD (e.g., "21800" = 21,800 LAK per 1 USD).
+    price4 (total debt) is already in LAK.
+    - totalDebtUsd = price4 / ex_rate
+    - totalDebtLak = price4
+    """
+    if not amount or not exchange_rate:
+        return None
     try:
-        return round(float(amount or 0.0) * float(exchange_rate or 0.0), 2)
+        ex_rate = float(str(exchange_rate).replace(",", ""))
+        if ex_rate <= 0:
+            return float(amount or 0.0)
+        return round(float(amount) / ex_rate, 2)
     except (ValueError, TypeError):
-        return round(float(amount or 0.0), 2)
+        return float(amount or 0.0)
+
+
+def to_lak(usd_amount, exchange_rate):
+    """Convert USD to LAK using exchange rate."""
+    if not usd_amount or not exchange_rate:
+        return None
+    try:
+        ex_rate = float(str(exchange_rate).replace(",", ""))
+        return round(float(usd_amount) * ex_rate, 2)
+    except (ValueError, TypeError):
+        return float(usd_amount or 0.0)

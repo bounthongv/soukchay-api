@@ -24,9 +24,9 @@ ssh apis@apis.com.la "mkdir -p $API_DIR"
 scp soukchay_api.tar.gz apis@apis.com.la:$API_DIR/
 ssh apis@apis.com.la "cd $API_DIR && tar -xzf soukchay_api.tar.gz && rm soukchay_api.tar.gz"
 
-# Install dependencies
+# Install dependencies in virtual environment
 echo "📦 Installing dependencies..."
-ssh apis@apis.com.la "cd $API_DIR && python3 -m pip install -r requirements.txt"
+ssh apis@apis.com.la "cd $API_DIR && python3 -m venv venv && ./venv/bin/pip install -r requirements.txt"
 
 # Create systemd service
 echo "🔧 Creating systemd service..."
@@ -40,7 +40,7 @@ Type=simple
 User=apis
 WorkingDirectory=$API_DIR
 Environment=PATH=$API_DIR/venv/bin
-ExecStart=/usr/bin/python3 -m uvicorn app.main:app --host 127.0.0.1 --port 5005 --reload
+ExecStart=$API_DIR/venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 5005
 Restart=always
 RestartSec=10
 
@@ -82,7 +82,7 @@ ssh apis@apis.com.la "sudo certbot --apache -d soukchay-api.apis.com.la -n --agr
 
 # Check service status
 echo "✅ Checking service status..."
-ssh apis@apis@apis.com.la "sudo systemctl status soukchay-api"
+ssh apis@apis.com.la "sudo systemctl status soukchay-api"
 
 echo "🎉 Deployment complete!"
 echo "🌐 Visit: https://soukchay-api.apis.com.la"
